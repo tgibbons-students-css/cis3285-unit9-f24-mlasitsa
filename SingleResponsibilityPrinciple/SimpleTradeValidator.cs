@@ -1,5 +1,4 @@
-﻿
-using SingleResponsibilityPrinciple.Contracts;
+﻿using SingleResponsibilityPrinciple.Contracts;
 
 namespace SingleResponsibilityPrinciple
 {
@@ -30,6 +29,13 @@ namespace SingleResponsibilityPrinciple
             if (!int.TryParse(tradeData[1], out tradeAmount))
             {
                 logger.LogWarning("Trade not a valid integer: '{0}'", tradeData[1]);
+                return false;
+            }
+            
+            // Validate that trade amount is within a valid range (1 to 100000)
+            if (tradeAmount <= 0 || tradeAmount > 100000)
+            {
+                logger.LogWarning("Trade amount is out of valid range (1-100000): '{0}'", tradeData[1]);
                 return false;
             }
 

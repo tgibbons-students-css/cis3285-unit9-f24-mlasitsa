@@ -1,6 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SingleResponsibilityPrinciple.Contracts;
 using SingleResponsibilityPrinciple;
+using System.Collections.Generic;
 
 namespace SingleResponsibilityPrinciple.Tests
 {
@@ -9,7 +10,7 @@ namespace SingleResponsibilityPrinciple.Tests
     {
         private int countStrings(IEnumerable<string> collectionOfStrings)
         {
-            // count the trades
+            // Count the trades
             int count = 0;
             foreach (var trade in collectionOfStrings)
             {
@@ -18,22 +19,20 @@ namespace SingleResponsibilityPrinciple.Tests
             return count;
         }
 
-
         [TestMethod()]
         public void TestSize1()
         {
-            //Arrange
+            // Arrange
             ILogger logger = new ConsoleLogger();
             string tradeURL = "http://faculty.css.edu/tgibbons/trades4.txt";
 
             ITradeDataProvider tradeProvider = new URLTradeDataProvider(tradeURL, logger);
 
-            //Act
-            IEnumerable<string> trades = tradeProvider.GetTradeData();
+            // Act
+            IEnumerable<string> trades = tradeProvider.GetTradeData(); // Use synchronous method
 
-            //Assert
-
-            Assert.AreEqual(countStrings(trades), 4);
+            // Assert
+            Assert.AreEqual(countStrings(trades), 4, "Expected 4 trades to be returned.");
         }
     }
 }

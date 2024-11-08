@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-
 using SingleResponsibilityPrinciple.AdoNet;
 using SingleResponsibilityPrinciple.Contracts;
 
@@ -11,42 +10,24 @@ namespace SingleResponsibilityPrinciple
         static void Main(string[] args)
         {
             ILogger logger = new ConsoleLogger();
-            // Open up the local textfile as a stream
-            String fileName = "SingleResponsibilityPrinciple.trades.txt";
-            Stream tradeStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(fileName);
-            if (tradeStream == null)
-            {
-                logger.LogWarning("trade file could not be openned at " + fileName);
-                Environment.Exit(1); // Exits the application with a non-zero exit code indicating an error
-            }
-            // data file to read from locally
-            //Stream tradeStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Unit9_Trader.trades.txt");
-            
+
             // URL to read trade file from
             string tradeURL = "http://faculty.css.edu/tgibbons/trades4.txt";
-            //Two different URLs for Restful API
-            //string restfulURL = "http://localhost:22359/api/TradeData";
-            string restfulURL = "http://unit9trader.azurewebsites.net/api/TradeData";
 
             ITradeValidator tradeValidator = new SimpleTradeValidator(logger);
 
-            //These are three different trade providers that read from different sources
-            ITradeDataProvider fileProvider = new StreamTradeDataProvider(tradeStream, logger);
-            //ITradeDataProvider urlProvider = new URLTradeDataProvider(tradeURL, logger);
-            //ITradeDataProvider restfulProvider = new RestfulTradeDataProvider(restfulURL, logger);
+            // Use URLTradeDataProvider to fetch trades from the specified URL
+            ITradeDataProvider urlProvider = new URLTradeDataProvider(tradeURL, logger);
 
             ITradeMapper tradeMapper = new SimpleTradeMapper();
             ITradeParser tradeParser = new SimpleTradeParser(tradeValidator, tradeMapper);
             ITradeStorage tradeStorage = new AdoNetTradeStorage(logger);
 
-            TradeProcessor tradeProcessor = new TradeProcessor(fileProvider, tradeParser, tradeStorage);
-            //TradeProcessor tradeProcessor = new TradeProcessor(urlProvider, tradeParser, tradeStorage);
+            // Use URL provider in the TradeProcessor
+            TradeProcessor tradeProcessor = new TradeProcessor(urlProvider, tradeParser, tradeStorage);
 
+            // Process trades
             tradeProcessor.ProcessTrades();
-
-            //Console.ReadKey();
-
-
         }
     }
 }
